@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="referrer" content="no-referrer" />
 <title>🚴 Directorio Cincoquince</title>
 <style>
   :root{
@@ -32,13 +33,20 @@
   .people-grid{display:flex;flex-direction:column;gap:20px;}
   .person-card{background:#fff;border-radius:16px;overflow:hidden;box-shadow:var(--shadow);}
   .person-header{display:flex;align-items:center;gap:16px;padding:20px 24px;background:linear-gradient(90deg,#f8fafc 0%,#eef2ff 100%);border-bottom:1px solid var(--border);flex-wrap:wrap;}
-  .avatar{width:64px;height:64px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.6rem;font-weight:700;flex-shrink:0;background-size:cover;background-position:center;}
+  .avatar{width:64px;height:64px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.6rem;font-weight:700;flex-shrink:0;overflow:hidden;}
+  .avatar img{width:100%;height:100%;object-fit:cover;}
   .person-info{flex:1;min-width:200px;}
   .person-name{font-size:1.25rem;font-weight:700;margin-bottom:4px;}
   .person-meta{font-size:.9rem;color:var(--gray);display:flex;flex-wrap:wrap;gap:12px;}
   .person-meta span{display:inline-flex;align-items:center;gap:4px;}
   .person-actions{display:flex;gap:8px;flex-wrap:wrap;}
   .person-actions .btn{padding:8px 14px;font-size:.85rem;}
+  .social-links{display:flex;gap:8px;margin-top:8px;}
+  .social{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;text-decoration:none;background:#fff;border:1px solid var(--border);transition:all .2s;box-shadow:0 1px 3px rgba(0,0,0,.06);}
+  .social:hover{transform:translateY(-2px);box-shadow:0 3px 8px rgba(0,0,0,.15);}
+  .social.ig:hover{background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);border-color:transparent;}
+  .social.li:hover{background:#0a66c2;border-color:transparent;}
+  .social.tk:hover{background:#000;border-color:transparent;}
   .catalog{padding:20px 24px;}
   .catalog-title{font-size:.85rem;font-weight:600;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;display:flex;align-items:center;gap:6px;}
   .items-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;}
@@ -173,6 +181,11 @@
         <div class="form-group"><label>Empresa / emprendimiento</label><input type="text" id="company" placeholder="Nombre de tu negocio (opcional)" /></div>
         <div class="form-group"><label>Sobre mí (bio corta)</label><textarea id="bio" placeholder="Cuéntanos qué haces y cómo puedes apoyar a la comunidad..."></textarea></div>
 
+        <div class="section-title">🌐 Redes sociales (opcional)</div>
+        <div class="form-group"><label>📸 Instagram</label><input type="url" id="instagram" placeholder="https://instagram.com/tu_usuario" /></div>
+        <div class="form-group"><label>💼 LinkedIn</label><input type="url" id="linkedin" placeholder="https://linkedin.com/in/tu_usuario" /></div>
+        <div class="form-group"><label>🎵 TikTok</label><input type="url" id="tiktok" placeholder="https://tiktok.com/@tu_usuario" /></div>
+
         <div class="section-title">🛍️ Mi catálogo</div>
         <div id="itemsContainer"></div>
         <button type="button" class="add-item-btn" onclick="addItemForm()">➕ Agregar producto o servicio</button>
@@ -189,12 +202,11 @@
 
 <script>
   // ⚙️ PEGA AQUÍ LA URL DE TU APLICACIÓN WEB DE GOOGLE APPS SCRIPT
-  const API_URL = 'https://script.google.com/macros/s/AKfycbxB5ESrEd1vsNKVmFNguMm4gQfxvQ_AX4txHI5bU70s7bPTne-zs-YIQt_z9OgtTIWe1A/exec';
+  const API_URL = 'PEGA_AQUI_LA_URL_DEL_APPS_SCRIPT';
 
   let people = [];
   let itemCounter = 0;
 
-  // ---- Cargar datos desde Google Sheets ----
   async function loadData(){
     const loader = document.getElementById('loader');
     try{
@@ -239,7 +251,7 @@
     grid.innerHTML=filtered.map(p=>`
       <div class="person-card">
         <div class="person-header">
-          <div class="avatar" ${p.avatar?`style="background-image:url('${p.avatar}');color:transparent;"`:''}>${p.avatar?'':p.name.charAt(0)}</div>
+          <div class="avatar">${p.avatar?`<img src="${p.avatar}" alt="${p.name}" referrerpolicy="no-referrer" onerror="this.parentNode.textContent='${p.name.charAt(0)}';">`:p.name.charAt(0)}</div>
           <div class="person-info">
             <div class="person-name">${p.name}</div>
             <div class="person-meta">
@@ -248,6 +260,11 @@
               ${p.email?`<span>✉️ ${p.email}</span>`:''}
             </div>
             ${p.bio?`<div style="margin-top:6px;font-size:.9rem;color:#444;">${p.bio}</div>`:''}
+            ${(p.instagram||p.linkedin||p.tiktok)?`<div class="social-links">
+              ${p.instagram?`<a href="${p.instagram}" target="_blank" rel="noopener" class="social ig" title="Instagram">📸</a>`:''}
+              ${p.linkedin?`<a href="${p.linkedin}" target="_blank" rel="noopener" class="social li" title="LinkedIn">💼</a>`:''}
+              ${p.tiktok?`<a href="${p.tiktok}" target="_blank" rel="noopener" class="social tk" title="TikTok">🎵</a>`:''}
+            </div>`:''}
           </div>
           <div class="person-actions">
             <a href="https://wa.me/${p.phone}" target="_blank" class="btn btn-success">💬 WhatsApp</a>
@@ -260,7 +277,7 @@
             ${p._filteredItems.map(i=>`
               <div class="item">
                 <div class="item-img-wrapper">
-                  ${i.img?`<img class="item-img" src="${i.img}" alt="${i.title}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"><div class="item-placeholder" style="display:none;">🖼️</div>`:`<div class="item-placeholder">🖼️</div>`}
+                  ${i.img?`<img class="item-img" src="${i.img}" alt="${i.title}" referrerpolicy="no-referrer" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"><div class="item-placeholder" style="display:none;">🖼️</div>`:`<div class="item-placeholder">🖼️</div>`}
                   <span class="badge-type">${i.type==='service'?'🛠️ Servicio':'📦 Producto'}</span>
                   ${i.discount?'<span class="badge">🏷️ Dcto</span>':''}
                 </div>
@@ -362,6 +379,9 @@
       email:document.getElementById('email').value,
       company:document.getElementById('company').value,
       bio:document.getElementById('bio').value,
+      instagram:document.getElementById('instagram').value.trim(),
+      linkedin:document.getElementById('linkedin').value.trim(),
+      tiktok:document.getElementById('tiktok').value.trim(),
       avatar:(avatarSrc&&avatarSrc.indexOf('data:image')===0)?avatarSrc:'',
       items
     };
@@ -371,7 +391,6 @@
     try{
       await fetch(API_URL,{
         method:'POST',
-        // Content-Type text/plain evita el "preflight" CORS con Apps Script
         headers:{'Content-Type':'text/plain;charset=utf-8'},
         body:JSON.stringify(newPerson)
       });
@@ -386,7 +405,6 @@
     }
   }
 
-  // Iniciar
   loadData();
 </script>
 </body>
