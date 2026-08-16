@@ -201,25 +201,26 @@
 
 <script>
   // ⚙️ 1) URL DE TU APLICACIÓN WEB DE GOOGLE APPS SCRIPT
-  const API_URL = 'https://script.google.com/macros/s/AKfycbxB5ESrEd1vsNKVmFNguMm4gQfxvQ_AX4txHI5bU70s7bPTne-zs-YIQt_z9OgtTIWe1A/exec';
+  const API_URL = 'https://script.google.com/macros/s/AKfycby2RDEFFDmhSgL0znBqTO8exkTDww2qYHijJrSHVcNP18Hg2WIkDIHDCxP3RWJ3C59gqQ/exec';
 
   // ⚙️ 2) CONFIGURACIÓN DE CLOUDINARY (para las imágenes)
-  const CLOUDINARY_CLOUD_NAME   = 'i6fmsozq';
+  const CLOUDINARY_CLOUD_NAME    = 'i6fmsozq';
   const CLOUDINARY_UPLOAD_PRESET = 'directorio515';
 
   let people = [];
   let itemCounter = 0;
 
-  // ---- Subir una imagen a Cloudinary y devolver su URL ----
+  // ---- Subir una imagen a Cloudinary y devolver su URL segura ----
   async function uploadToCloudinary(file){
     const fd = new FormData();
     fd.append('file', file);
     fd.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
-    const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
+    const res = await fetch('https://api.cloudinary.com/v1_1/' + CLOUDINARY_CLOUD_NAME + '/image/upload', {
       method:'POST', body:fd
     });
     const data = await res.json();
-    if(!data.secure_url) throw new Error('Error al subir imagen a Cloudinary');
+    console.log('Respuesta Cloudinary:', data);            // 👀 para depurar
+    if(!data.secure_url) throw new Error('Cloudinary no devolvió URL. Revisa Cloud name y Upload preset (debe ser Unsigned).');
     return data.secure_url;
   }
 
@@ -376,7 +377,6 @@
     const phone=document.getElementById('phone').value;
     if(!name||!city||!phone){alert('Completa los datos de contacto obligatorios.');return;}
 
-    // Validar items
     const itemForms=document.querySelectorAll('.item-form');
     const itemsRaw=[];let valid=true;
     itemForms.forEach(f=>{
@@ -398,12 +398,12 @@
     btn.textContent='Subiendo imágenes...';btn.disabled=true;
 
     try{
-      // 1) Subir foto de perfil (si hay)
+      // 1) Foto de perfil -> Cloudinary (obtiene URL https://)
       let avatarURL='';
       const avatarFile=document.getElementById('avatarInput').files[0];
       if(avatarFile) avatarURL=await uploadToCloudinary(avatarFile);
 
-      // 2) Subir imágenes de cada item (si hay)
+      // 2) Imagen de cada item -> Cloudinary
       const items=[];
       for(const it of itemsRaw){
         let imgURL='';
@@ -411,7 +411,7 @@
         items.push({type:it.type,title:it.title,desc:it.desc,cat:it.cat,price:it.price,discount:it.discount,img:imgURL});
       }
 
-      // 3) Enviar todo a Google Sheets
+      // 3) Enviar a Google Sheets (la URL de Cloudinary va TAL CUAL, sin filtros)
       btn.textContent='Guardando...';
       const newPerson={
         name,city,phone,
@@ -424,6 +424,7 @@
         avatar:avatarURL,
         items
       };
+      console.log('Enviando a Sheets:', newPerson);        // 👀 para depurar
       await fetch(API_URL,{
         method:'POST',
         headers:{'Content-Type':'text/plain;charset=utf-8'},
@@ -433,7 +434,7 @@
       closeModal();
       await loadData();
     }catch(err){
-      alert('❌ Ocurrió un error: '+err.message+'. Revisa tu conexión e intenta de nuevo.');
+      alert('❌ Ocurrió un error: '+err.message);
       console.error(err);
     }finally{
       btn.textContent='Publicar en el directorio';btn.disabled=false;
