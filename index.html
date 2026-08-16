@@ -40,12 +40,12 @@
   .person-meta span{display:inline-flex;align-items:center;gap:4px;}
   .person-actions{display:flex;gap:8px;flex-wrap:wrap;}
   .person-actions .btn{padding:8px 14px;font-size:.85rem;}
-  .social-links{display:flex;gap:8px;margin-top:8px;}
-  .social{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;text-decoration:none;background:#fff;border:1px solid var(--border);transition:all .2s;box-shadow:0 1px 3px rgba(0,0,0,.06);}
-  .social:hover{transform:translateY(-2px);box-shadow:0 3px 8px rgba(0,0,0,.15);}
-  .social.ig:hover{background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);border-color:transparent;}
-  .social.li:hover{background:#0a66c2;border-color:transparent;}
-  .social.tk:hover{background:#000;border-color:transparent;}
+  .social-links{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;}
+  .social{padding:5px 14px;border-radius:20px;display:inline-flex;align-items:center;font-size:.8rem;font-weight:600;text-decoration:none;color:#fff;transition:all .2s;box-shadow:0 1px 3px rgba(0,0,0,.1);}
+  .social:hover{transform:translateY(-2px);box-shadow:0 3px 8px rgba(0,0,0,.2);opacity:.92;}
+  .social.ig{background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);}
+  .social.li{background:#0a66c2;}
+  .social.tk{background:#000;}
   .catalog{padding:20px 24px;}
   .catalog-title{font-size:.85rem;font-weight:600;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;display:flex;align-items:center;gap:6px;}
   .items-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;}
@@ -174,7 +174,7 @@
           </div>
         </div>
         <div class="form-row">
-          <div class="form-group"><label>WhatsApp *</label><input type="tel" id="phone" required placeholder="573001234567" /></div>
+          <div class="form-group"><label>WhatsApp *</label><input type="tel" id="phone" required placeholder="573001234567" /><small style="display:block;margin-top:4px;color:var(--gray);font-size:.8rem;">📌 Escribe el número anteponiendo <b>57</b> (indicativo de Colombia), sin espacios ni signos. Ej: <b>573001234567</b></small></div>
           <div class="form-group"><label>Correo electrónico</label><input type="email" id="email" placeholder="tu@email.com" /></div>
         </div>
         <div class="form-group"><label>Empresa / emprendimiento</label><input type="text" id="company" placeholder="Nombre de tu negocio (opcional)" /></div>
@@ -278,9 +278,9 @@
             </div>
             ${p.bio?`<div style="margin-top:6px;font-size:.9rem;color:#444;">${p.bio}</div>`:''}
             ${(p.instagram||p.linkedin||p.tiktok)?`<div class="social-links">
-              ${p.instagram?`<a href="${p.instagram}" target="_blank" rel="noopener" class="social ig" title="Instagram">📸</a>`:''}
-              ${p.linkedin?`<a href="${p.linkedin}" target="_blank" rel="noopener" class="social li" title="LinkedIn">💼</a>`:''}
-              ${p.tiktok?`<a href="${p.tiktok}" target="_blank" rel="noopener" class="social tk" title="TikTok">🎵</a>`:''}
+              ${p.instagram?`<a href="${p.instagram}" target="_blank" rel="noopener" class="social ig">Instagram</a>`:''}
+              ${p.linkedin?`<a href="${p.linkedin}" target="_blank" rel="noopener" class="social li">LinkedIn</a>`:''}
+              ${p.tiktok?`<a href="${p.tiktok}" target="_blank" rel="noopener" class="social tk">TikTok</a>`:''}
             </div>`:''}
           </div>
           <div class="person-actions">
