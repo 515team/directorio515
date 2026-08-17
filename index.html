@@ -121,16 +121,6 @@
     <input type="text" id="searchItem" placeholder="🔍 Buscar producto o servicio..." oninput="applyFilters()" />
     <select id="category" onchange="applyFilters()">
       <option value="">Todas las categorías</option>
-      <option value="Deportes">🚴 Deportes / Ciclismo</option>
-      <option value="Salud">🏥 Salud</option>
-      <option value="Tecnología">💻 Tecnología</option>
-      <option value="Marketing">📢 Marketing</option>
-      <option value="Alimentos">🍎 Alimentos</option>
-      <option value="Ropa">👕 Ropa y accesorios</option>
-      <option value="Automotriz">🚗 Automotriz</option>
-      <option value="Turismo">✈️ Turismo</option>
-      <option value="Educación">📚 Educación</option>
-      <option value="Otros">📌 Otros</option>
     </select>
     <select id="city" onchange="applyFilters()">
       <option value="">Todas las ciudades</option>
@@ -212,6 +202,31 @@
   const CLOUDINARY_CLOUD_NAME    = 'i6fmsozq';
   const CLOUDINARY_UPLOAD_PRESET = 'directorio515';
 
+  // ---- Categorías principales y sus subcategorías ----
+  const CATEGORIES = {
+    "🍽️ Gastronomía / Alimentos y Bebidas": ["Restaurantes y Bares","Cafeterías y Repostería","Comida rápida y Mercados"],
+    "💼 Servicios Profesionales y Empresariales": ["Servicios jurídicos y legales","Contabilidad y finanzas","Consultoría y recursos humanos"],
+    "🚴 Deportes y Ciclismo": ["Venta y mantenimiento de bicicletas","Ropa y accesorios deportivos","Gimnasios y bienestar físico"],
+    "👕 Moda, Ropa y Accesorios": ["Ropa casual y formal","Calzado y marroquinería","Joyería y complementos"],
+    "🏥 Salud y Bienestar": ["Clínicas, consultorios y especialistas","Farmacias y productos naturales","Estética y cuidado personal"],
+    "💻 Tecnología y Comunicaciones": ["Software, apps y servicios IT","Hardware y dispositivos electrónicos","Telecomunicaciones"],
+    "🏠 Hogar, Inmobiliaria y Construcción": ["Inmobiliarias y constructoras","Diseño de interiores y ferretería","Muebles y decoración"],
+    "🚗 Automotriz y Movilidad": ["Venta de vehículos y repuestos","Talleres de mecánica y detailing","Servicios de transporte y logística"],
+    "✈️ Turismo y Entretenimiento": ["Agencias de viajes y hoteles","Organización de eventos","Cultura, cine y recreación"],
+    "📚 Educación y Formación": ["Instituciones educativas y universidades","Cursos en línea y capacitación","Academias y talleres"],
+    "📢 Marketing y Publicidad": ["Agencias de marketing digital","Producción audiovisual y diseño","Medios de comunicación"],
+    "📌 Otros / Servicios Varios": ["Otros / Servicios Varios"]
+  };
+  // Mapa subcategoría -> categoría principal (para filtrar por grupo)
+  const SUBCAT_TO_MAIN = {};
+  Object.keys(CATEGORIES).forEach(main=>CATEGORIES[main].forEach(sub=>SUBCAT_TO_MAIN[sub]=main));
+  // Opciones para el <select> de registro (con optgroups) y para el filtro (solo principales)
+  const CAT_SELECT_OPTIONS = '<option value="">Selecciona...</option>' +
+    Object.keys(CATEGORIES).map(main=>`<optgroup label="${main}">`+
+      CATEGORIES[main].map(sub=>`<option value="${sub}">${sub}</option>`).join('')+`</optgroup>`).join('');
+  const CAT_FILTER_OPTIONS = '<option value="">Todas las categorías</option>' +
+    Object.keys(CATEGORIES).map(main=>`<option value="${main}">${main}</option>`).join('');
+
   let people = [];
   let itemCounter = 0;
 
@@ -249,7 +264,8 @@
       if(city && p.city!==city)return false;
       if(searchName && !p.name.toLowerCase().includes(searchName) && !(p.company||'').toLowerCase().includes(searchName))return false;
       const matchItems=(p.items||[]).filter(i=>{
-        if(cat && i.cat!==cat)return false;
+        // 'cat' es una categoría PRINCIPAL; coincide si la subcategoría del item pertenece a ella
+        if(cat && SUBCAT_TO_MAIN[i.cat]!==cat && i.cat!==cat)return false;
         if(searchItem && !i.title.toLowerCase().includes(searchItem) && !i.desc.toLowerCase().includes(searchItem))return false;
         return true;
       });
@@ -351,7 +367,7 @@
         </div>
         <div class="form-group"><label>Descripción *</label><textarea class="itm-desc" required></textarea></div>
         <div class="form-row">
-          <div class="form-group"><label>Categoría *</label><select class="itm-cat" required><option value="">Selecciona...</option><option>Deportes</option><option>Salud</option><option>Tecnología</option><option>Marketing</option><option>Alimentos</option><option>Ropa</option><option>Automotriz</option><option>Turismo</option><option>Educación</option><option>Otros</option></select></div>
+          <div class="form-group"><label>Categoría *</label><select class="itm-cat" required>${CAT_SELECT_OPTIONS}</select></div>
           <div class="form-group"><label>Precio (opcional)</label><input type="number" class="itm-price" placeholder="COP" /></div>
         </div>
         <div class="form-group"><label>Imagen</label>
@@ -440,6 +456,9 @@
       btn.textContent='Publicar en el directorio';btn.disabled=false;
     }
   }
+
+  // Poblar el filtro de categorías con las 12 principales
+  document.getElementById('category').innerHTML = CAT_FILTER_OPTIONS;
 
   loadData();
 </script>
